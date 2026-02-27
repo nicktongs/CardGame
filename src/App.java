@@ -2,7 +2,7 @@ import processing.core.PApplet;
 
 public class App extends PApplet {
 
-    CardGame cardGame = new MonopolyDeal();
+    CardGame cardGame = new Uno();
     private int timer;
 
     public static void main(String[] args) {
@@ -17,7 +17,7 @@ public class App extends PApplet {
     public void draw() {
         background(255);
         // Draw player hands
-        cardGame.playerOneHand.draw(this);      // bottom (you)
+        cardGame.playerOneHand.draw(this);// bottom (you)
         // Draw computer hand (top)
         cardGame.playerTwoHand.draw(this);
         // Draw extra left and right hands
