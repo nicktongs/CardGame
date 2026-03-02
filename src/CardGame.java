@@ -62,46 +62,51 @@ public class CardGame {
         }
     }
 
-    protected void dealCards(int numCards) {
-        Collections.shuffle(deck);
-        for (int i = 0; i < numCards; i++) {
-            playerOneHand.addCard(deck.remove(0));
-            Card card = deck.remove(0);
-            card.setTurned(true);
-            playerTwoHand.addCard(card);
-        }
 
-        // position cards
-        playerOneHand.positionCards(50, 450, 80, 120, 20);
-        playerTwoHand.positionCards(50, 50, 80, 120, 20);
-        //         Collections.shuffle(deck);
+        protected void dealCards(int numCards) {
+    Collections.shuffle(deck);
+
+    for (int i = 0; i < numCards; i++) {
+        // Player 1 (bottom)
+        playerOneHand.addCard(deck.remove(0));
+
+        // Player 2 (top)
+        Card card2 = deck.remove(0);
+        card2.setTurned(true);
+        playerTwoHand.addCard(card2);
+
+        // Player 3 (left)
+        Card card3 = deck.remove(0);
+        card3.setTurned(true);
+        playerThreeHand.addCard(card3);
+
+        // Player 4 (right)
+        Card card4 = deck.remove(0);
+        card4.setTurned(true);
+        playerFourHand.addCard(card4);
+    }
+
+    // Arrange all 4 hand positions clearly
+    playerOneHand.positionCards(100, 520, 80, 120, 20); // bottom (you)
+    playerTwoHand.positionCards(100, 40, 80, 120, 20);  // top
+    positionVerticalHand(playerThreeHand, 40, 100, 80, 120, 25); // left
+    positionVerticalHand(playerFourHand, 520, 100, 80, 120, 25); // right
+}
+
+        // Collections.shuffle(deck);
         // for (int i = 0; i < numCards; i++) {
-        //     // bottom: real Player One (face up)
         //     playerOneHand.addCard(deck.remove(0));
-
-        //     // top: real Player Two / computer (face down)
-        //     Card cardTop = deck.remove(0);
-        //     cardTop.setTurned(true);
-        //     playerTwoHand.addCard(cardTop);
-
-        //     // left: extra player 3 (face down, UI only)
-        //     Card cardLeft = deck.remove(0);
-        //     cardLeft.setTurned(true);
-        //     playerThreeHand.addCard(cardLeft);
-
-        //     // right: extra player 4 (face down, UI only)
-        //     Card cardRight = deck.remove(0);
-        //     cardRight.setTurned(true);
-        //     playerFourHand.addCard(cardRight);
+        //     Card card = deck.remove(0);
+        //     card.setTurned(true);
+        //     playerTwoHand.addCard(card);
         // }
 
-        // // position cards: bottom, top, left, right
+        // // position cards
         // playerOneHand.positionCards(50, 450, 80, 120, 20);
         // playerTwoHand.positionCards(50, 50, 80, 120, 20);
-        // positionVerticalHand(playerThreeHand, 50, 100, 80, 120, 20);
-        // positionVerticalHand(playerFourHand, 470, 100, 80, 120, 20);
 
-    }
+
+    
 
     // Position a hand vertically (for left and right players)
     protected void positionVerticalHand(Hand hand, int startX, int startY, int cardWidth, int cardHeight, int spacing) {
@@ -161,14 +166,28 @@ public class CardGame {
         switchTurns();
         return true;
     }
+int currentPlayer = 1; // 1 = human, 2–4 = CPU
 
-    public void switchTurns() {
-        playerOneTurn = !playerOneTurn;
-        playerOneHand.positionCards(50, 450, 80, 120, 20);
-        playerTwoHand.positionCards(50, 50, 80, 120, 20);
-        playerThreeHand.positionCards (50, 40, 80, 120, 20);
-        playerFourHand.positionCards(50, 400, 80, 120, 20);
-    }
+public void switchTurns() {
+    currentPlayer++;
+    if (currentPlayer > 4) currentPlayer = 1; // loop back
+
+    // reposition after each turn
+    playerOneHand.positionCards(100, 520, 80, 120, 20);
+    playerTwoHand.positionCards(100, 40, 80, 120, 20);
+    positionVerticalHand(playerThreeHand, 40, 100, 80, 120, 25);
+    positionVerticalHand(playerFourHand, 520, 100, 80, 120, 25);
+}
+
+    // public void switchTurns() {
+        // playerOneTurn = !playerOneTurn;
+        // playerOneHand.positionCards(50, 450, 80, 120, 20);
+        // playerTwoHand.positionCards(50, 50, 80, 120, 20);
+        // playerThreeHand.positionCards (50, 40, 80, 120, 20);
+        // playerFourHand.positionCards(50, 400, 80, 120, 20);
+
+        
+    // }
 
 
     public String getCurrentPlayer() {
