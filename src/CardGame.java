@@ -131,14 +131,14 @@ positionVerticalHand(playerFourHand, 540, 140, 70, 110, 25);
         }
     }
 
-    public void handleDrawButtonClick(int mouseX, int mouseY) {
-        if (drawButton.isClicked(mouseX, mouseY) && playerOneTurn) {
-            drawCard(playerOneHand);
-            // Switch turns after drawing
-            switchTurns();
-            
-        }
+public void handleDrawButtonClick(int mouseX, int mouseY) {
+    // Only I can click Draw
+    if (drawButton.isClicked(mouseX, mouseY) && currentPlayer == 1) {
+        drawCard(playerOneHand);
+        switchTurns();
     }
+}
+
 
     public boolean playCard(Card card, Hand hand) {
         // Check if card is valid to play
@@ -178,9 +178,7 @@ public String getCurrentPlayer() {
     }
 }
 
-    // public String getCurrentPlayer() {
-    //     return playerOneTurn ? "Player One" : "Player Two";
-    // }
+
 
     public Card getLastPlayedCard() {
         return lastPlayedCard;
@@ -211,34 +209,38 @@ public String getCurrentPlayer() {
     }
 }
 
-    public void handleCardClick(int mouseX, int mouseY) {
-        if (!playerOneTurn) {
-            return;
-        }
-        Card clickedCard = getClickedCard(mouseX, mouseY);
-        if (clickedCard == null) {
-            return;
-        }
-        // this is for the first time
-        if (selectedCard == null) {
-            selectedCard = clickedCard;
-            selectedCard.setSelected(true, selectedCardRaiseAmount);
-            return;
-        }
+public void handleCardClick(int mouseX, int mouseY) {
+    // Only human can click cards
+    if (currentPlayer != 1) {
+        return;
+    }
 
-        if (selectedCard == clickedCard) {
-            System.out.println("playing card: " + selectedCard.value + " of " + selectedCard.suit);
-            if (playCard(selectedCard, playerOneHand)) {
-                selectedCard.setSelected(false, selectedCardRaiseAmount);
-                selectedCard = null;
-            }
-            return;
-        }
-        // change selection
-        selectedCard.setSelected(false, selectedCardRaiseAmount);
+    Card clickedCard = getClickedCard(mouseX, mouseY);
+    if (clickedCard == null) {
+        return;
+    }
+
+    if (selectedCard == null) {
         selectedCard = clickedCard;
         selectedCard.setSelected(true, selectedCardRaiseAmount);
+        return;
     }
+
+    if (selectedCard == clickedCard) {
+        System.out.println("playing card: " + selectedCard.value + " of " + selectedCard.suit);
+        if (playCard(selectedCard, playerOneHand)) {
+            selectedCard.setSelected(false, selectedCardRaiseAmount);
+            selectedCard = null;
+        }
+        return;
+    }
+
+    // change selection
+    selectedCard.setSelected(false, selectedCardRaiseAmount);
+    selectedCard = clickedCard;
+    selectedCard.setSelected(true, selectedCardRaiseAmount);
+}
+
 
     // return the card that is clicked!
     public Card getClickedCard(int mouseX, int mouseY) {

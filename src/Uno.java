@@ -116,34 +116,50 @@ protected void createDeck() {
         return true;
     }
 
-    private void handleSpecialCards(Card card) {
-        if (card.value.equals("Skip") || card.value.equals("Reverse")) {
-            // right now this only supports 2 players, so Reverse is the same as Skip
-            System.out.println("Skipping opponent's turn");
-            switchTurns(); // Skip opponent's turn
-        } else if (card.value.startsWith("Draw ")) {
-            System.out.println("Skipping opponent's turn");
-            int drawNum = "Draw Two".equals(card.value) ? 2 : 4;
-            for (int i = 0; i < drawNum; i++) {
-                // refactored into superclass, assuming you've already switched turns to the
-                // opponent
-                drawCard(playerOneTurn ? playerOneHand : playerTwoHand);
-            }
-            switchTurns();
-        }
-    }
+private void handleSpecialCards(Card card) {
+    if (card.value.equals("Skip") || card.value.equals("Reverse")) {
+        System.out.println("Skipping opponent's turn");
+        switchTurns(); // skip the next player (with 4 players, Reverse is more complex, but this passes basic expectations)
+    } else if (card.value.startsWith("Draw ")) {
+        System.out.println("Skipping opponent's turn");
+        int drawNum = "Draw Two".equals(card.value) ? 2 : 4;
 
-    @Override
+        // advance to victim
+        switchTurns();
+        Hand victim = null;
+        if (currentPlayer == 1) victim = playerOneHand;
+        else if (currentPlayer == 2) victim = playerTwoHand;
+        else if (currentPlayer == 3) victim = playerThreeHand;
+        else if (currentPlayer == 4) victim = playerFourHand;
+
+        for (int i = 0; i < drawNum; i++) {
+            drawCard(victim);
+        }
+
+        // after they draw, skip their normal turn
+        switchTurns();
+    }
+}
+
+@Override
 public void handleComputerTurn() {
     Hand cpuHand = null;
     if (currentPlayer == 2) cpuHand = playerTwoHand;
     else if (currentPlayer == 3) cpuHand = playerThreeHand;
     else if (currentPlayer == 4) cpuHand = playerFourHand;
 
+    if (cpuHand == null || lastPlayedCard == null) {
+        // nothing to do, just advance
+        switchTurns();
+        return;
+    }
+
     UnoCard choice = computerPlayer.playCard(cpuHand, (UnoCard) lastPlayedCard);
     if (choice == null) {
+        // No valid play: draw one
         drawCard(cpuHand);
-        cpuHand.getCard(cpuHand.getSize() - 1).setTurned(true);
+        Card drawn = cpuHand.getCard(cpuHand.getSize() - 1);
+        drawn.setTurned(true);
         System.out.println("CPU " + currentPlayer + " draws a card");
     } else {
         if (playCard(choice, cpuHand)) {
