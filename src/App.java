@@ -46,7 +46,7 @@ public void settings() {
             cardGame.getLastPlayedCard().draw(this);
         }
 
-if (!cardGame.getCurrentPlayer().equals("Player One")) {
+        if (!cardGame.getCurrentPlayer().equals("Player One")) {
     fill(0);
     textSize(16);
     text("CPU " + cardGame.getCurrentPlayer() + " is thinking...", width / 2, height / 2 + 80);
@@ -55,8 +55,6 @@ if (!cardGame.getCurrentPlayer().equals("Player One")) {
         cardGame.handleComputerTurn();
         timer = 0;
     }
-}
-
 }
 
         cardGame.drawChoices(this);
