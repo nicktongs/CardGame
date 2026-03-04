@@ -86,27 +86,17 @@ public class CardGame {
         playerFourHand.addCard(card4);
     }
 
-    // Arrange all 4 hand positions clearly
-    playerOneHand.positionCards(100, 520, 80, 120, 20); // bottom (you)
-    playerTwoHand.positionCards(100, 40, 80, 120, 20);  // top
-    positionVerticalHand(playerThreeHand, 40, 100, 80, 120, 25); // left
-    positionVerticalHand(playerFourHand, 520, 100, 80, 120, 25); // right
+//Arrangement of hands
+playerOneHand.positionCards(120, 520, 70, 110, 20);
+//top
+playerTwoHand.positionCards(120, 40, 70, 110, 20);
+// Left (CPU 3)
+positionVerticalHand(playerThreeHand, 40, 140, 70, 110, 25);
+// Right (CPU 4)
+positionVerticalHand(playerFourHand, 540, 140, 70, 110, 25);
+
 }
 
-        // Collections.shuffle(deck);
-        // for (int i = 0; i < numCards; i++) {
-        //     playerOneHand.addCard(deck.remove(0));
-        //     Card card = deck.remove(0);
-        //     card.setTurned(true);
-        //     playerTwoHand.addCard(card);
-        // }
-
-        // // position cards
-        // playerOneHand.positionCards(50, 450, 80, 120, 20);
-        // playerTwoHand.positionCards(50, 50, 80, 120, 20);
-
-
-    
 
     // Position a hand vertically (for left and right players)
     protected void positionVerticalHand(Hand hand, int startX, int startY, int cardWidth, int cardHeight, int spacing) {
@@ -178,21 +168,19 @@ public void switchTurns() {
     positionVerticalHand(playerThreeHand, 40, 100, 80, 120, 25);
     positionVerticalHand(playerFourHand, 520, 100, 80, 120, 25);
 }
-
-    // public void switchTurns() {
-        // playerOneTurn = !playerOneTurn;
-        // playerOneHand.positionCards(50, 450, 80, 120, 20);
-        // playerTwoHand.positionCards(50, 50, 80, 120, 20);
-        // playerThreeHand.positionCards (50, 40, 80, 120, 20);
-        // playerFourHand.positionCards(50, 400, 80, 120, 20);
-
-        
-    // }
-
-
-    public String getCurrentPlayer() {
-        return playerOneTurn ? "Player One" : "Player Two";
+public String getCurrentPlayer() {
+    switch (currentPlayer) {
+        case 1: return "Player One";
+        case 2: return "Player Two";
+        case 3: return "Player Three";
+        case 4: return "Player Four";
+        default: return "Unknown";
     }
+}
+
+    // public String getCurrentPlayer() {
+    //     return playerOneTurn ? "Player One" : "Player Two";
+    // }
 
     public Card getLastPlayedCard() {
         return lastPlayedCard;
@@ -211,9 +199,17 @@ public void switchTurns() {
     }
 
     public void handleComputerTurn() {
-        drawCard(playerTwoHand);
+    Hand cpuHand = null;
+    if (currentPlayer == 2) cpuHand = playerTwoHand;
+    else if (currentPlayer == 3) cpuHand = playerThreeHand;
+    else if (currentPlayer == 4) cpuHand = playerFourHand;
+
+    if (cpuHand != null) {
+        drawCard(cpuHand);
+        System.out.println("CPU " + currentPlayer + " draws a card");
         switchTurns();
     }
+}
 
     public void handleCardClick(int mouseX, int mouseY) {
         if (!playerOneTurn) {

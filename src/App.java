@@ -8,10 +8,10 @@ public class App extends PApplet {
     public static void main(String[] args) {
         PApplet.main("App");
     }
-    @Override
-    public void settings() {
-        size(600, 600);   
-    }
+@Override
+public void settings() {
+    size(700, 700);
+}
 
     @Override
     public void draw() {
@@ -45,16 +45,17 @@ public class App extends PApplet {
             cardGame.getLastPlayedCard().setPosition(width / 2 - 40, height / 2 - 60, 80, 120);
             cardGame.getLastPlayedCard().draw(this);
         }
-        if (cardGame.getCurrentPlayer() == "Player Two") {
-            fill(0);
-            textSize(16);
-            text("Computer is thinking...", width / 2, height / 2 + 80);
-            timer++;
-            if (timer == 100) {
-                cardGame.handleComputerTurn();
-                timer = 0;
-            }
-        }
+
+        if (!cardGame.getCurrentPlayer().equals("Player One")) {
+    fill(0);
+    textSize(16);
+    text("CPU " + cardGame.getCurrentPlayer() + " is thinking...", width / 2, height / 2 + 80);
+    timer++;
+    if (timer == 100) {
+        cardGame.handleComputerTurn();
+        timer = 0;
+    }
+}
 
         cardGame.drawChoices(this);
     }

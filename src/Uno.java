@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import processing.core.PApplet;
 
 public class Uno extends CardGame {
@@ -16,25 +18,30 @@ public class Uno extends CardGame {
         initializeGame();
     }
 
-    @Override
-    protected void createDeck() {
-        // Create deck (Uno has 108 cards)
-        // Create standard cards (2 of each color/value combination except 0)
-        for (String color : colors) {
-            deck.add(new Card("0", color)); // One 0 card per color
-            for (String value : values) {
-                deck.add(new Card(value, color));
-                deck.add(new Card(value, color)); // Two of each
+@Override
+protected void createDeck() {
+    deck = new ArrayList<>();  // make sure we reset the list
 
-            }
-        }
-        // Add wild cards (4 of each type)
-        for (int i = 0; i < 4; i++) {
-            // suit, value
-            deck.add(new Card("Wild", "Wild"));
-            deck.add(new Card("Wild", "Draw Four"));
+    // Create standard Uno cards (2 of each color/value, except 0)
+    for (String color : colors) {
+        // one 0 per color
+        deck.add(new UnoCard("0", color));
+
+        // two of each 1–9, Skip, Reverse, Draw Two
+        for (String value : values) {
+            deck.add(new UnoCard(value, color));
+            deck.add(new UnoCard(value, color));
         }
     }
+
+    // Add wild cards (4 of each type)
+    for (int i = 0; i < 4; i++) {
+        // value, suit (suit “Wild” so your checks still work)
+        deck.add(new UnoCard("Wild", "Wild"));
+        deck.add(new UnoCard("Draw Four", "Wild"));
+    }
+}
+
 
     @Override
     protected void initializeGame() {
@@ -127,25 +134,26 @@ public class Uno extends CardGame {
     }
 
     @Override
-    public void handleComputerTurn() {
-        UnoCard choice = computerPlayer.playCard(playerTwoHand, (UnoCard) lastPlayedCard);
-        if (choice == null) {
-            drawCard(playerTwoHand);
-            playerTwoHand.getCard(0).setTurned(true);
-            System.out.println("player two draws");
-            switchTurns();
-            return;
-        }
-        if (playCard(choice, playerTwoHand)) {
+public void handleComputerTurn() {
+    Hand cpuHand = null;
+    if (currentPlayer == 2) cpuHand = playerTwoHand;
+    else if (currentPlayer == 3) cpuHand = playerThreeHand;
+    else if (currentPlayer == 4) cpuHand = playerFourHand;
+
+    UnoCard choice = computerPlayer.playCard(cpuHand, (UnoCard) lastPlayedCard);
+    if (choice == null) {
+        drawCard(cpuHand);
+        cpuHand.getCard(cpuHand.getSize() - 1).setTurned(true);
+        System.out.println("CPU " + currentPlayer + " draws a card");
+    } else {
+        if (playCard(choice, cpuHand)) {
             if ("Wild".equals(choice.suit)) {
-                choice.suit = computerPlayer.chooseComputerWildColor(playerTwoHand);
+                choice.suit = computerPlayer.chooseComputerWildColor(cpuHand);
             }
-            playerOneHand.positionCards(50, 450, 80, 120, 20);
-            playerTwoHand.positionCards(50, 50, 80, 120, 20);
-        } else {
-            System.out.println("ERROR, player two / computer chose an invalid play");
         }
     }
+    switchTurns();
+}
 
     @Override
     public void drawChoices(PApplet app) {
