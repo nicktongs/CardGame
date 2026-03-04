@@ -6,24 +6,27 @@ import processing.core.PApplet;
 public class CardGame {
     // Core game components
     ArrayList<Card> deck = new ArrayList<>();
-    Hand playerOneHand;
-    Hand playerTwoHand;
-    Hand playerThreeHand;
-    Hand playerFourHand;
-    ArrayList<Card> discardPile = new ArrayList<>();
+Hand playerOneHand;
+CpuHand playerTwoHand;
+CpuHand playerThreeHand;
+CpuHand playerFourHand;
+
+       ArrayList<Card> discardPile = new ArrayList<>();
     Card selectedCard;
     int selectedCardRaiseAmount = 15;
 
     // Game state
-    boolean playerOneTurn = true;
+    int currentPlayer = 1; // 1 = human, 2–4 = CPU
     Card lastPlayedCard;
-    boolean gameActive;
+    boolean gameActive = true;
     String winnerName = null;
+
+    // UI for end screen
     ClickableRectangle playAgainButton = null;
 
 
     // UI
-    ClickableRectangle drawButton;
+    DrawButton drawButton;
     int drawButtonX = 250;
     int drawButtonY = 400;
     int drawButtonWidth = 100;
@@ -36,31 +39,35 @@ public class CardGame {
 
     protected void initializeGame() {
         // Initialize draw button
-        drawButton = new ClickableRectangle();
+        drawButton = new DrawButton(drawButtonX, drawButtonY, drawButtonWidth, drawButtonHeight);
         drawButton.x = drawButtonX;
         drawButton.y = drawButtonY;
         drawButton.width = drawButtonWidth;
         drawButton.height = drawButtonHeight;
 
+        // Initialize play again button for win screen
+        playAgainButton = new ClickableRectangle();
+        playAgainButton.x = 250;
+        playAgainButton.y = 450;
+        playAgainButton.width = 200;
+        playAgainButton.height = 60;
+
         // Initialize decks and hands
         deck = new ArrayList<>();
         discardPile = new ArrayList<>();
         playerOneHand = new Hand();
-        playerTwoHand = new Hand();
-        playerThreeHand = new Hand();
-        playerFourHand = new Hand();
+        playerTwoHand = new CpuHand("Player Two");
+        playerThreeHand = new CpuHand("Player Three");
+        playerFourHand = new CpuHand("Player Four");
+
+
         gameActive = true;
-    playAgainButton = new ClickableRectangle();
-    playAgainButton.x = 250;
-    playAgainButton.y = 450;
-    playAgainButton.width = 200;
-    playAgainButton.height = 60;
+        winnerName = null;
+        currentPlayer = 1;
 
-    gameActive = true;
-    winnerName = null;
+        createDeck();
+    }
 
-    createDeck();
-}
 
     protected void createDeck() {
         // Create a standard deck of cards (for simplicity, using numbers and suits)
@@ -95,6 +102,21 @@ public class CardGame {
         Card card4 = deck.remove(0);
         card4.setTurned(true);
         playerFourHand.addCard(card4);
+    }
+    protected void checkForWinner() {
+        if (playerOneHand.getSize() == 0) {
+            winnerName = "Player One";
+            gameActive = false;
+        } else if (playerTwoHand.getSize() == 0) {
+            winnerName = "Player Two";
+            gameActive = false;
+        } else if (playerThreeHand.getSize() == 0) {
+            winnerName = "Player Three";
+            gameActive = false;
+        } else if (playerFourHand.getSize() == 0) {
+            winnerName = "Player Four";
+            gameActive = false;
+        }
     }
 
 //Arrangement of hands
@@ -151,27 +173,30 @@ public void handleDrawButtonClick(int mouseX, int mouseY) {
 }
 
 
-public boolean playCard(Card card, Hand hand) {
-    if (!isValidPlay(card)) {
-        System.out.println("Invalid play: " + card.value + " of " + card.suit);
-        return false;
-    }
-    hand.removeCard(card);
-    card.setTurned(false);
-    discardPile.add(card);
-    lastPlayedCard = card;
+    public boolean playCard(Card card, Hand hand) {
+        // Check if card is valid to play
+        if (!isValidPlay(card)) {
+            System.out.println("Invalid play: " + card.value + " of " + card.suit);
+            return false;
+        }
+        // Remove card from hand
+        hand.removeCard(card);
+        card.setTurned(false);
+        // Add to discard pile
+        discardPile.add(card);
+        lastPlayedCard = card;
 
-    checkForWinner();
-    if (!gameActive) {
-        // stop switching turns if game is over
+        //endcheck
+        checkForWinner();
+        if (!gameActive) {
+            return true;
+        }
+
+        // Switch turns
+        switchTurns();
         return true;
     }
 
-    switchTurns();
-    return true;
-}
-
-int currentPlayer = 1; // 1 = human, 2–4 = CPU
 
 public void switchTurns() {
     currentPlayer++;
