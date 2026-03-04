@@ -96,3 +96,4 @@ public class Card extends ClickableRectangle {
         sketch.strokeWeight(1);
     }
 }
+

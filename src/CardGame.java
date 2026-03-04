@@ -18,6 +18,9 @@ public class CardGame {
     boolean playerOneTurn = true;
     Card lastPlayedCard;
     boolean gameActive;
+    String winnerName = null;
+    ClickableRectangle playAgainButton = null;
+
 
     // UI
     ClickableRectangle drawButton;
@@ -47,9 +50,17 @@ public class CardGame {
         playerThreeHand = new Hand();
         playerFourHand = new Hand();
         gameActive = true;
+    playAgainButton = new ClickableRectangle();
+    playAgainButton.x = 250;
+    playAgainButton.y = 450;
+    playAgainButton.width = 200;
+    playAgainButton.height = 60;
 
-        createDeck();
-    }
+    gameActive = true;
+    winnerName = null;
+
+    createDeck();
+}
 
     protected void createDeck() {
         // Create a standard deck of cards (for simplicity, using numbers and suits)
@@ -140,22 +151,26 @@ public void handleDrawButtonClick(int mouseX, int mouseY) {
 }
 
 
-    public boolean playCard(Card card, Hand hand) {
-        // Check if card is valid to play
-        if (!isValidPlay(card)) {
-            System.out.println("Invalid play: " + card.value + " of " + card.suit);
-            return false;
-        }
-        // Remove card from hand
-        hand.removeCard(card);
-        card.setTurned(false);
-        // Add to discard pile
-        discardPile.add(card);
-        lastPlayedCard = card;
-        // Switch turns
-        switchTurns();
+public boolean playCard(Card card, Hand hand) {
+    if (!isValidPlay(card)) {
+        System.out.println("Invalid play: " + card.value + " of " + card.suit);
+        return false;
+    }
+    hand.removeCard(card);
+    card.setTurned(false);
+    discardPile.add(card);
+    lastPlayedCard = card;
+
+    checkForWinner();
+    if (!gameActive) {
+        // stop switching turns if game is over
         return true;
     }
+
+    switchTurns();
+    return true;
+}
+
 int currentPlayer = 1; // 1 = human, 2–4 = CPU
 
 public void switchTurns() {
